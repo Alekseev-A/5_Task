@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language">ru</string>
+
+    <string name="app_name">Погода</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    Стороны света
+    <string name="north">С %1$s%2$s</string>
+    <string name="northeast">СВ %1$s%2$s</string>
+    <string name="east">В %1$s%2$s</string>
+    <string name="southeast">ЮВ %1$s%2$s</string>
+    <string name="south">Ю %1$s%2$s</string>
+    <string name="southwest">ЮЗ %1$s%2$s</string>
+    <string name="west">З %1$s%2$s</string>
+    <string name="northwest">СЗ %1$s%2$s</string>
+    Скорость ветра
+    <string name="speed">м/с</string>
+
+</resources>

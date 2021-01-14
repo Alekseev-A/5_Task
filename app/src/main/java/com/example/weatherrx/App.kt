@@ -2,14 +2,10 @@ package com.example.weatherrx
 
 import android.app.Application
 import com.example.weatherrx.di.AppComponent
-import com.example.weatherrx.di.DaggerAppComponent
 import com.example.weatherrx.di.AppModule
+import com.example.weatherrx.di.DaggerAppComponent
 
-/**
- * Created by Artem Alexeev on 21.10.2020.
- * Application for this app.
- * Used for a Dagger.
- */
+
 class App : Application() {
     companion object {
         var dagger: AppComponent? = null

@@ -1,11 +1,13 @@
 package com.example.weatherrx.di
 
+import com.example.weatherrx.ui.cities.CitiesListFragment
+import com.example.weatherrx.ui.cities.CitiesListViewModel
+import com.example.weatherrx.ui.details.DetailsViewModel
 import dagger.Component
-import ru.job4j.weather.di.StoreModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, StoreModule::class, RemoteModule::class])
+@Component(modules = [AppModule::class, RemoteModule::class, StoreModule::class, ViewModelModule::class])
 interface AppComponent {
-//    fun inject(mainActivityPresenter: MainActivityPresenter)
+    fun inject(citiesListFragment: CitiesListFragment)
 }
