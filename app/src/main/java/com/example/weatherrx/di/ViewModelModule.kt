@@ -10,7 +10,6 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import kotlin.reflect.KClass
 
-
 @Module
 abstract class ViewModelModule {
 
@@ -32,4 +31,3 @@ abstract class ViewModelModule {
     @MapKey
     annotation class ViewModelKey(val value: KClass<out ViewModel>)
 }
-

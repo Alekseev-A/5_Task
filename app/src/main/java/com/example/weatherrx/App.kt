@@ -5,7 +5,6 @@ import com.example.weatherrx.di.AppComponent
 import com.example.weatherrx.di.AppModule
 import com.example.weatherrx.di.DaggerAppComponent
 
-
 class App : Application() {
     companion object {
         var dagger: AppComponent? = null

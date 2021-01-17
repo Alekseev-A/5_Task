@@ -1,6 +1,8 @@
 package com.example.weatherrx.data
 
 import com.example.weatherrx.data.entities.City
+import com.example.weatherrx.data.entities.response.ResponseCities
+import com.example.weatherrx.data.entities.response.ResponseCity
 import com.example.weatherrx.data.entities.response.ResponseDays
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
@@ -18,7 +20,7 @@ interface OpenWeatherApi {
         @Query("appid") key: String,
         @Query("lang") language: String,
         @Query("units") units: String = UNITS,
-    ): Observable<City>
+    ): Observable<ResponseCity>
 
     @GET("onecall")
     fun getDetails(
@@ -35,5 +37,5 @@ interface OpenWeatherApi {
         @Query("appid") key: String,
         @Query("lang") language: String,
         @Query("units") units: String = UNITS
-    ): Observable<List<City>>
+    ): Observable<ResponseCities>
 }

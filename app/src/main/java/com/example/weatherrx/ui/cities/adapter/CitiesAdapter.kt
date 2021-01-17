@@ -9,13 +9,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.weatherrx.R
 import com.example.weatherrx.data.entities.City
+import com.example.weatherrx.data.entities.CityForecast
 import com.example.weatherrx.databinding.CityHolderForRvBinding
+import com.example.weatherrx.ui.cities.CityViewItem
 
 
 class CitiesAdapter(
-    private val onClick: (City) -> Unit,
-    private val onLongClick: (City) -> Unit
-) : ListAdapter<City, CitiesAdapter.NotesViewHolder>(NotesDiffCallback()) {
+    private val onClick: (CityViewItem) -> Unit,
+    private val onLongClick: (CityViewItem) -> Unit
+) : ListAdapter<CityViewItem, CitiesAdapter.NotesViewHolder>(NotesDiffCallback()) {
 
     inner class NotesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -23,12 +25,12 @@ class CitiesAdapter(
             CityHolderForRvBinding.bind(itemView)
         }
 
-        lateinit var city: City
+        lateinit var cityViewItem: CityViewItem
 
         init {
-            binding.root.setOnClickListener { onClick(city) }
+            binding.root.setOnClickListener { onClick(cityViewItem) }
             binding.root.setOnLongClickListener {
-                onLongClick(city)
+                onLongClick(cityViewItem)
                 true
             }
         }
@@ -42,30 +44,30 @@ class CitiesAdapter(
         }
 
         fun renderCityName() {
-            binding.cityHolder.cityNameTextView.text = city.name
+            binding.cityHolder.cityNameTextView.text = cityViewItem.forecast.name
         }
 
         fun renderPressure() {
-            binding.cityHolder.pressureTextView.text = city.main.pressure.toString()
+            binding.cityHolder.pressureTextView.text = cityViewItem.forecast.pressure.toString()
         }
 
         fun renderTemperature() {
-            binding.cityHolder.tempTextView.text = city.main.temp.toString()
+            binding.cityHolder.tempTextView.text = cityViewItem.forecast.temp.toString()
         }
 
         fun renderWind() {
             binding.cityHolder.windTextView.text =
                 binding.root.context.getString(
-                    windDirection(city.wind.deg),
-                    city.wind.speed.toString(),
-                    R.string.speed
+                    windDirection(cityViewItem.forecast.windDeg),
+                    cityViewItem.forecast.windSpeed.toString(),
+                    binding.root.context.getString(R.string.speed)
                 )
         }
 
         fun renderIcon() {
             Glide
                 .with(binding.root)
-                .load(city.weather[0].icon)
+                .load("https://openweathermap.org/img/wn/${cityViewItem.forecast.icon}@2x.png")
                 .into(binding.cityHolder.iconImageView)
         }
 
@@ -84,27 +86,29 @@ class CitiesAdapter(
             }
     }
 
-    class NotesDiffCallback : DiffUtil.ItemCallback<City>() {
+    class NotesDiffCallback : DiffUtil.ItemCallback<CityViewItem>() {
 
         override fun areItemsTheSame(
-            oldItem: City,
-            newItem: City
-        ): Boolean = oldItem.cityId == oldItem.cityId
+            oldItem: CityViewItem,
+            newItem: CityViewItem
+        ): Boolean = oldItem.city.id == oldItem.city.id
 
         override fun areContentsTheSame(
-            oldItem: City,
-            newItem: City
+            oldItem: CityViewItem,
+            newItem: CityViewItem
         ): Boolean = oldItem == newItem
 
         override fun getChangePayload(
-            oldItem: City,
-            newItem: City
+            oldItem: CityViewItem,
+            newItem: CityViewItem
         ) = mutableListOf<NotesViewHolder.() -> Unit>().apply {
-            if (oldItem.name != newItem.name) add { renderCityName() }
-            if (oldItem.main.pressure != newItem.main.pressure) add { renderPressure() }
-            if (oldItem.main.temp != newItem.main.temp) add { renderTemperature() }
-            if (oldItem.wind != newItem.wind) add { renderWind() }
-            if (oldItem.weather[0].icon != newItem.weather[0].icon) add { renderIcon() }
+            if (oldItem.forecast.name != newItem.forecast.name) add { renderCityName() }
+            if (oldItem.forecast.pressure != newItem.forecast.pressure) add { renderPressure() }
+            if (oldItem.forecast.temp != newItem.forecast.temp) add { renderTemperature() }
+            if (oldItem.forecast.windDeg != newItem.forecast.windDeg ||
+                oldItem.forecast.windSpeed != newItem.forecast.windSpeed
+            ) add { renderWind() }
+            if (oldItem.forecast.icon != newItem.forecast.icon) add { renderIcon() }
         }
     }
 
@@ -119,7 +123,7 @@ class CitiesAdapter(
     )
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
-        holder.city = getItem(position)
+        holder.cityViewItem = getItem(position)
         holder.bind()
     }
 
@@ -128,7 +132,7 @@ class CitiesAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        holder.city = getItem(position)
+        holder.cityViewItem = getItem(position)
 
         if (payloads.isEmpty()) {
             holder.bind()
