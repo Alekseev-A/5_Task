@@ -1,8 +1,7 @@
 package com.example.weatherrx.di
 
 import com.example.weatherrx.ui.cities.CitiesListFragment
-import com.example.weatherrx.ui.cities.CitiesListViewModel
-import com.example.weatherrx.ui.details.DetailsViewModel
+import com.example.weatherrx.ui.find.FindFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -10,4 +9,5 @@ import javax.inject.Singleton
 @Component(modules = [AppModule::class, RemoteModule::class, StoreModule::class, ViewModelModule::class])
 interface AppComponent {
     fun inject(citiesListFragment: CitiesListFragment)
+    fun inject(findFragment: FindFragment)
 }

@@ -1,12 +1,19 @@
 package com.example.weatherrx.data.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "city")
+@Entity(
+    tableName = "city",
+    indices = [Index(
+        value = [ "id"],
+        unique = true
+    )]
+)
 data class City(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val cityId: Int,
-    val position: Int = id
+    val count: Int = 0,
+    val id: Int,
+    val position: Long
 )

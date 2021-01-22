@@ -1,38 +1,32 @@
 package com.example.weatherrx.ui.cities.adapter
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.weatherrx.R
-import com.example.weatherrx.data.entities.City
-import com.example.weatherrx.data.entities.CityForecast
-import com.example.weatherrx.databinding.CityHolderForRvBinding
+import com.example.weatherrx.databinding.CityHolderInCardViewBinding
 import com.example.weatherrx.ui.cities.CityViewItem
+import com.example.weatherrx.utils.toCardinalPoints
+import com.example.weatherrx.utils.toTemperature
+import kotlin.math.roundToInt
 
 
 class CitiesAdapter(
     private val onClick: (CityViewItem) -> Unit,
-    private val onLongClick: (CityViewItem) -> Unit
-) : ListAdapter<CityViewItem, CitiesAdapter.NotesViewHolder>(NotesDiffCallback()) {
+) : ListAdapter<CityViewItem, CitiesAdapter.CityViewItemHolder>(CityViewItemDiffCallback()) {
 
-    inner class NotesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CityViewItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val binding: CityHolderForRvBinding by lazy(LazyThreadSafetyMode.NONE) {
-            CityHolderForRvBinding.bind(itemView)
+        private val binding: CityHolderInCardViewBinding by lazy(LazyThreadSafetyMode.NONE) {
+            CityHolderInCardViewBinding.bind(itemView)
         }
 
         lateinit var cityViewItem: CityViewItem
 
         init {
             binding.root.setOnClickListener { onClick(cityViewItem) }
-            binding.root.setOnLongClickListener {
-                onLongClick(cityViewItem)
-                true
-            }
         }
 
         fun bind() {
@@ -44,7 +38,7 @@ class CitiesAdapter(
         }
 
         fun renderCityName() {
-            binding.cityHolder.cityNameTextView.text = cityViewItem.forecast.name
+            binding.cityHolder.cityNameTextView.text = cityViewItem.forecast.name + cityViewItem.city.position
         }
 
         fun renderPressure() {
@@ -52,13 +46,13 @@ class CitiesAdapter(
         }
 
         fun renderTemperature() {
-            binding.cityHolder.tempTextView.text = cityViewItem.forecast.temp.toString()
+            binding.cityHolder.tempTextView.text = cityViewItem.forecast.temp.toTemperature()
         }
 
         fun renderWind() {
             binding.cityHolder.windTextView.text =
                 binding.root.context.getString(
-                    windDirection(cityViewItem.forecast.windDeg),
+                    cityViewItem.forecast.windDeg.toCardinalPoints(),
                     cityViewItem.forecast.windSpeed.toString(),
                     binding.root.context.getString(R.string.speed)
                 )
@@ -70,23 +64,9 @@ class CitiesAdapter(
                 .load("https://openweathermap.org/img/wn/${cityViewItem.forecast.icon}@2x.png")
                 .into(binding.cityHolder.iconImageView)
         }
-
-        private fun windDirection(deg: Int): Int =
-            when (deg) {
-                in 0..22 -> R.string.north
-                in 23..67 -> R.string.northeast
-                in 68..112 -> R.string.east
-                in 113..157 -> R.string.southeast
-                in 158..202 -> R.string.south
-                in 203..247 -> R.string.southwest
-                in 248..292 -> R.string.west
-                in 293..337 -> R.string.northwest
-                in 338..360 -> R.string.north
-                else -> 0
-            }
     }
 
-    class NotesDiffCallback : DiffUtil.ItemCallback<CityViewItem>() {
+    class CityViewItemDiffCallback : DiffUtil.ItemCallback<CityViewItem>() {
 
         override fun areItemsTheSame(
             oldItem: CityViewItem,
@@ -101,7 +81,8 @@ class CitiesAdapter(
         override fun getChangePayload(
             oldItem: CityViewItem,
             newItem: CityViewItem
-        ) = mutableListOf<NotesViewHolder.() -> Unit>().apply {
+        ) = mutableListOf<CityViewItemHolder.() -> Unit>().apply {
+
             if (oldItem.forecast.name != newItem.forecast.name) add { renderCityName() }
             if (oldItem.forecast.pressure != newItem.forecast.pressure) add { renderPressure() }
             if (oldItem.forecast.temp != newItem.forecast.temp) add { renderTemperature() }
@@ -112,37 +93,40 @@ class CitiesAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = NotesViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = CityViewItemHolder(
         LayoutInflater
             .from(parent.context)
             .inflate(
-                R.layout.city_holder_for_rv,
+                R.layout.city_holder_in_card_view,
                 parent,
                 false
             )
     )
 
-    override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
-        holder.cityViewItem = getItem(position)
-        holder.bind()
+    override fun onBindViewHolder(itemHolder: CityViewItemHolder, position: Int) {
+        itemHolder.cityViewItem = getItem(position)
+        itemHolder.bind()
     }
 
-    override fun onBindViewHolder(
-        holder: NotesViewHolder,
-        position: Int,
-        payloads: MutableList<Any>
-    ) {
-        holder.cityViewItem = getItem(position)
+//    override fun onBindViewHolder(
+//        itemHolder: CityViewItemHolder,
+//        position: Int,
+//        payloads: MutableList<Any>
+//    ) {
+//        itemHolder.cityViewItem = getItem(position)
+//
+//        if (payloads.isEmpty()) {
+//            itemHolder.bind()
+//        }
+//
+//        @Suppress("UNCHECKED_CAST")
+//        for (changes in payloads as List<List<CityViewItemHolder.() -> Unit>>) {
+//            for (change in changes) {
+//                change(itemHolder)
+//            }
+//        }
+//    }
 
-        if (payloads.isEmpty()) {
-            holder.bind()
-        }
+    public override fun getItem(position: Int): CityViewItem = super.getItem(position)
 
-        @Suppress("UNCHECKED_CAST")
-        for (changes in payloads as List<List<NotesViewHolder.() -> Unit>>) {
-            for (change in changes) {
-                change(holder)
-            }
-        }
-    }
 }

@@ -2,7 +2,7 @@ package com.example.weatherrx.data.entities.response
 
 class ResponseCity(
     val coord: Coord,
-    val dt: Int,
+    val dt: Long,
     val id: Int,
     val main: Main,
     val name: String,
@@ -26,7 +26,7 @@ class ResponseCity(
 
     class Wind(
         val deg: Int,
-        val speed: Int
+        val speed: Double
     )
 }
 

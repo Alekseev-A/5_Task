@@ -1,5 +1,6 @@
 package com.example.weatherrx.data.store
 
+import android.util.Log
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -18,6 +19,7 @@ import javax.inject.Provider
 abstract class RoomDB : RoomDatabase() {
     abstract fun getCityDao(): CityDao
     abstract fun getCityForecastDao(): CityForecastDao
+    abstract fun getCityWithForecast(): CityWithForecastDao
 
     class Callback @Inject constructor(
         private val database: Provider<CityDao>
@@ -25,10 +27,11 @@ abstract class RoomDB : RoomDatabase() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
 
-            Thread{
+            Thread {
                 val dao = database.get()
-                dao.insertCity(City(cityId = 625144))
-                dao.insertCity(City(cityId = 524901))
+                val first = dao.insertCity(City(id = 625144, position = 1))
+                val second = dao.insertCity(City(id = 524901, position = 2))
+                Log.d("TAG", "onCreate: $first $second")
             }.start()
         }
     }

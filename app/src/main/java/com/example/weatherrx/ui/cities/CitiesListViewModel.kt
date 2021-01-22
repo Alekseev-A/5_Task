@@ -1,51 +1,96 @@
 package com.example.weatherrx.ui.cities
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.weatherrx.R
-import com.example.weatherrx.data.OpenWeatherApi
-import com.example.weatherrx.data.entities.City
-import com.example.weatherrx.data.entities.CityForecast
-import com.example.weatherrx.data.store.CityDao
+import com.example.weatherrx.data.entities.CityWithForecast
+import com.example.weatherrx.domain.CitiesRepository
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 import javax.inject.Inject
 
 class CitiesListViewModel @Inject constructor(
-    cityDao: CityDao,
-    api: OpenWeatherApi,
-    context: Context
+    private val citiesRepository: CitiesRepository,
 ) : ViewModel() {
+    private val disposeBag = CompositeDisposable()
 
-    val citiesObservable = cityDao.getCities().flatMap { list ->
-        var ids = ""
-        list.forEachIndexed { index, city ->
-            ids += city.cityId
-            if (index != list.size - 1) ids += ","
-        }
-        return@flatMap api.getCities(
-            cityIds = ids,
-            language = context.getString(R.string.language),
-            key = context.getString(R.string.api_key)
+    val citiesBehaviorSubject: BehaviorSubject<List<CityViewItem>> =
+        BehaviorSubject.createDefault(listOf())
+
+    val isUpdatingBehaviorSubject: BehaviorSubject<Boolean> =
+        BehaviorSubject.createDefault(false)
+
+    val forShowingPublishSubject: PublishSubject<String> =
+        PublishSubject.create()
+
+    init {
+        disposeBag.add(
+            citiesRepository
+                .citiesWithForecast
+                .subscribe({
+                    citiesBehaviorSubject.onNext(convertToViewItem(it))
+                }, {
+                    forShowingPublishSubject.onNext(it.localizedMessage)
+                })
         )
     }
-        .map { response ->
-        val result = mutableListOf<CityViewItem>()
 
-        response.list.forEach {
-            result.add(
-                CityViewItem(
-                    City(cityId = it.id),
-                    CityForecast(
-                        name = it.name,
-                        icon = it.weather[0].icon,
-                        pressure = it.main.pressure,
-                        temp = it.main.temp,
-                        windDeg = it.wind.deg,
-                        windSpeed = it.wind.speed,
-                        cityId = it.id
-                    )
-                )
+    override fun onCleared() {
+        super.onCleared()
+        disposeBag.dispose()
+    }
+
+    fun update() {
+        isUpdatingBehaviorSubject.onNext(true)
+        disposeBag.add(
+            citiesRepository
+                .refreshCities()
+                .subscribe({
+                    isUpdatingBehaviorSubject.onNext(false)
+                }, {
+                    forShowingPublishSubject.onNext(it.localizedMessage)
+                    isUpdatingBehaviorSubject.onNext(false)
+                })
+        )
+    }
+
+    private fun convertToViewItem(citiesWithForecast: List<CityWithForecast>) =
+        citiesWithForecast.mapNotNull {
+            if (it.forecast == null) return@mapNotNull null
+            else CityViewItem(
+                it.city,
+                it.forecast
             )
         }
-        return@map result
+
+
+    fun onCityClick(cityViewItem: CityViewItem) {
+
+    }
+
+    fun onCityLongClick(cityViewItem: CityViewItem) {
+
+    }
+
+    fun selectCityForDelete(city: CityViewItem) {
+        disposeBag.add(
+            Completable.fromAction {
+                citiesRepository.deleteCity(city.city)
+            }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+        )
+    }
+
+    fun selectCitiesForSwapPositions(first: CityViewItem, second: CityViewItem) {
+        disposeBag.add(
+            Completable.fromAction {
+                citiesRepository.swapPositionsForCities(first.city, second.city)
+            }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+        )
     }
 }

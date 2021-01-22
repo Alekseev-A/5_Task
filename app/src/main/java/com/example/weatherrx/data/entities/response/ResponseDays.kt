@@ -9,7 +9,7 @@ class ResponseDays(
     class Day(
         val clouds: Int,
         val dew_point: Double,
-        val dt: Int,
+        val dt: Long,
         val humidity: Int,
         val pop: Double,
         val pressure: Int,

@@ -23,7 +23,7 @@ open class Fragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayoutId)
 interface Screen {
     fun observeVM(): Disposable = Disposable.disposed()
     var isActive: Boolean
-    fun <T> Observable<T>.observe(accept: (T) -> Unit, error: (Throwable) -> Unit): Disposable
+    fun <T> Observable<T>.observe(accept: (T) -> Unit): Disposable
 }
 
 class ScreenImpl : Screen {
@@ -43,10 +43,9 @@ class ScreenImpl : Screen {
         }
 
     override fun <T> Observable<T>.observe(
-        accept: (T) -> Unit,
-        error: (Throwable) -> Unit
+        accept: (T) -> Unit
     ): Disposable =
         observeOn(AndroidSchedulers.mainThread())
-            .subscribe(accept, error)
+            .subscribe(accept)
 
 }

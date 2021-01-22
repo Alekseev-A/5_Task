@@ -2,8 +2,10 @@ package com.example.weatherrx.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.example.weatherrx.data.store.*
+import com.example.weatherrx.data.store.CityDao
+import com.example.weatherrx.data.store.CityForecastDao
+import com.example.weatherrx.data.store.CityWithForecastDao
+import com.example.weatherrx.data.store.RoomDB
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -30,5 +32,8 @@ class StoreModule {
     fun provideCityDao(db: RoomDB): CityDao = db.getCityDao()
 
     @Provides
-    fun provideDetailsDao(db: RoomDB): CityForecastDao = db.getCityForecastDao()
+    fun provideCityForecastDao(db: RoomDB): CityForecastDao = db.getCityForecastDao()
+
+    @Provides
+    fun provideCityWithForecastDao(db: RoomDB): CityWithForecastDao = db.getCityWithForecast()
 }

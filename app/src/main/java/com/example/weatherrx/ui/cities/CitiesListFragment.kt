@@ -2,7 +2,6 @@ package com.example.weatherrx.ui.cities
 
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.weatherrx.App
 import com.example.weatherrx.R
@@ -21,6 +19,7 @@ import com.example.weatherrx.ui.cities.adapter.ItemTouchHelperCallback
 import com.example.weatherrx.ui.core.Fragment
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import java.util.*
 import javax.inject.Inject
 
 
@@ -32,39 +31,48 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities) {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val adapter = CitiesAdapter(
-        {
-//            viewModel.onCityClick(it)
-        },
-        {
-//            viewModel.onCityLongClick(it)
-        }
+        onClick = { viewModel.onCityClick(it) }
     )
+
+    private var binding: FragmentCitiesBinding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        App.dagger?.inject(this)
+        viewModel = ViewModelProvider(this, viewModelFactory)[CitiesListViewModel::class.java]
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App.dagger?.inject(this)
-        viewModel = ViewModelProvider(this, viewModelFactory)[CitiesListViewModel::class.java]
-
-        FragmentCitiesBinding.bind(view).setup()
+        binding = FragmentCitiesBinding.bind(view).setup()
         observeVM()
     }
 
-    override fun observeVM(): Disposable {
-        return CompositeDisposable(
-            viewModel.citiesObservable.observe ({
-                Log.d("TAG", "observeVM: $it")
-                adapter.submitList(it)
-            }, {
-                Log.d("TAG", "observeVM: $it")
-            })
-        )
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
+
+    override fun observeVM(): Disposable = CompositeDisposable(
+        viewModel.citiesBehaviorSubject.observe(
+            adapter::submitList
+        ),
+        viewModel.isUpdatingBehaviorSubject.observe {
+            binding?.swipeRefreshLayout?.isRefreshing = it
+        },
+        viewModel.forShowingPublishSubject.observe {
+            activity?.let { activity ->
+                Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
 
     private fun FragmentCitiesBinding.setup(): FragmentCitiesBinding {
 
         fab.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_CitiesListFragment_to_findFragment)
         }
 
         swipeRefreshLayout.setup()
@@ -76,13 +84,15 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities) {
         layoutManager = LinearLayoutManager(activity)
 
         adapter = this@CitiesListFragment.adapter
-        adapter?.stateRestorationPolicy =
-            StateRestorationPolicy.PREVENT_WHEN_EMPTY
+//        adapter?.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-        val callback: ItemTouchHelper.Callback =
-            ItemTouchHelperCallback(
-                { currentPosition: Int, targetPosition: Int -> },
-                { currentPosition: Int -> })
+        val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(
+            ::swapCitiesIndexesByPosition,
+            ::deleteCityByPosition,
+            {
+                binding!!.swipeRefreshLayout.isEnabled = !it
+            }
+        )
         val touchHelper = ItemTouchHelper(callback)
         touchHelper.attachToRecyclerView(this)
 
@@ -101,9 +111,33 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities) {
         )
     }
 
+    private fun deleteCityByPosition(position: Int) {
+        viewModel.selectCityForDelete(adapter.getItem(position))
+    }
+
+
+    private fun swapCitiesIndexesByPosition(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                viewModel.selectCitiesForSwapPositions(
+                    adapter.getItem(i),
+                    adapter.getItem(i + 1)
+                )
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                viewModel.selectCitiesForSwapPositions(
+                    adapter.getItem(i),
+                    adapter.getItem(i - 1)
+                )
+            }
+        }
+        adapter.notifyItemMoved(fromPosition, toPosition)
+    }
+
     private fun SwipeRefreshLayout.setup() {
         setOnRefreshListener {
-            Toast.makeText(requireActivity(), viewModel.toString(), Toast.LENGTH_LONG).show()
+            viewModel.update()
         }
         setColorSchemeResources(
             android.R.color.holo_blue_bright,
@@ -112,5 +146,4 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities) {
             android.R.color.holo_red_light
         )
     }
-
 }

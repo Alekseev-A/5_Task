@@ -74,7 +74,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava3:$retrofitVersion"
-//    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
 
     //RxJava
     implementation "io.reactivex.rxjava3:rxjava:3.0.8"
@@ -86,8 +85,8 @@ dependencies {
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.room:room-rxjava3:$roomVersion"
 
-    //RecyclerView
-    implementation "androidx.recyclerview:recyclerview:1.2.0-beta01"
+//    //RecyclerView
+//    implementation "androidx.recyclerview:recyclerview:1.2.0-beta01"
 
     //Glide
     def glideVersion = '4.11.0'
