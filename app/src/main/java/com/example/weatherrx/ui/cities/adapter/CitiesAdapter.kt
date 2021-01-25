@@ -38,7 +38,7 @@ class CitiesAdapter(
         }
 
         fun renderCityName() {
-            binding.cityHolder.cityNameTextView.text = cityViewItem.forecast.name + cityViewItem.city.position
+            binding.cityHolder.cityNameTextView.text = cityViewItem.forecast.name
         }
 
         fun renderPressure() {
@@ -71,7 +71,8 @@ class CitiesAdapter(
         override fun areItemsTheSame(
             oldItem: CityViewItem,
             newItem: CityViewItem
-        ): Boolean = oldItem.city.id == oldItem.city.id
+        ): Boolean =
+            oldItem.city.id == newItem.city.id
 
         override fun areContentsTheSame(
             oldItem: CityViewItem,
@@ -82,7 +83,6 @@ class CitiesAdapter(
             oldItem: CityViewItem,
             newItem: CityViewItem
         ) = mutableListOf<CityViewItemHolder.() -> Unit>().apply {
-
             if (oldItem.forecast.name != newItem.forecast.name) add { renderCityName() }
             if (oldItem.forecast.pressure != newItem.forecast.pressure) add { renderPressure() }
             if (oldItem.forecast.temp != newItem.forecast.temp) add { renderTemperature() }
@@ -108,24 +108,24 @@ class CitiesAdapter(
         itemHolder.bind()
     }
 
-//    override fun onBindViewHolder(
-//        itemHolder: CityViewItemHolder,
-//        position: Int,
-//        payloads: MutableList<Any>
-//    ) {
-//        itemHolder.cityViewItem = getItem(position)
-//
-//        if (payloads.isEmpty()) {
-//            itemHolder.bind()
-//        }
-//
-//        @Suppress("UNCHECKED_CAST")
-//        for (changes in payloads as List<List<CityViewItemHolder.() -> Unit>>) {
-//            for (change in changes) {
-//                change(itemHolder)
-//            }
-//        }
-//    }
+    override fun onBindViewHolder(
+        itemHolder: CityViewItemHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        itemHolder.cityViewItem = getItem(position)
+
+        if (payloads.isEmpty()) {
+            itemHolder.bind()
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        for (changes in payloads as List<List<CityViewItemHolder.() -> Unit>>) {
+            for (change in changes) {
+                change(itemHolder)
+            }
+        }
+    }
 
     public override fun getItem(position: Int): CityViewItem = super.getItem(position)
 

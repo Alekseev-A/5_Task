@@ -2,7 +2,7 @@ package com.example.weatherrx.ui.find
 
 import androidx.lifecycle.ViewModel
 import com.example.weatherrx.R
-import com.example.weatherrx.data.entities.CityForecast
+import com.example.weatherrx.data.entities.CityWithForecast
 import com.example.weatherrx.domain.FindRepository
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class FindViewModel @Inject constructor(private val repository: FindRepository) : ViewModel() {
 
-    val foundCityBehaviourSubject: BehaviorSubject<CityForecast> =
+    val foundCityBehaviourSubject: BehaviorSubject<CityWithForecast> =
         BehaviorSubject.create()
     val onBackPressedPublishSubject: PublishSubject<Boolean> =
         PublishSubject.create()
@@ -30,11 +30,16 @@ class FindViewModel @Inject constructor(private val repository: FindRepository) 
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .switchMapSingle { query ->
                     repository
-                        .findByCityName(query)
+                        .getCityWithForecastByCityName(query)
                         .onErrorResumeWith {}
                 }
                 .subscribe({
-                    foundCityBehaviourSubject.onNext(it)
+                    foundCityBehaviourSubject.onNext(
+                        CityWithForecast(
+                            it.city,
+                            it.forecast
+                        )
+                    )
                 }, {
 
                 })
@@ -50,10 +55,10 @@ class FindViewModel @Inject constructor(private val repository: FindRepository) 
         disposeBag.dispose()
     }
 
-    fun clickOnCity(id: Int) {
+    fun clickOnCity() {
         disposeBag.add(
             repository
-                .addCityInDB(id)
+                .addCityInDB(foundCityBehaviourSubject.value)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     onBackPressedPublishSubject.onNext(true)

@@ -1,18 +1,17 @@
 package com.example.weatherrx.ui.find
 
-import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.weatherrx.App
 import com.example.weatherrx.R
-import com.example.weatherrx.data.entities.CityForecast
+import com.example.weatherrx.data.entities.CityWithForecast
 import com.example.weatherrx.databinding.FragmentFindBinding
+import com.example.weatherrx.ui.cities.CityViewItem
 import com.example.weatherrx.ui.core.Fragment
 import com.example.weatherrx.utils.toCardinalPoints
 import com.example.weatherrx.utils.toTemperature
@@ -52,11 +51,12 @@ class FindFragment : Fragment(R.layout.fragment_find) {
 
     override fun observeVM(): Disposable {
         return CompositeDisposable(
-            viewModel.foundCityBehaviourSubject.observe { forecast ->
-                setupUI(forecast)
+            viewModel.foundCityBehaviourSubject.observe { cityWithForecast ->
+                setupUI(cityWithForecast)
             },
             viewModel.onBackPressedPublishSubject.observe {
-                if (it) requireActivity().onBackPressed()
+                binding.editTextTextPersonName.clearFocus()
+                requireActivity().onBackPressed()
             },
             viewModel.forShowingPublishSubject.observe {
                 Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
@@ -64,25 +64,25 @@ class FindFragment : Fragment(R.layout.fragment_find) {
         )
     }
 
-    private fun setupUI(forecast: CityForecast) {
+    private fun setupUI(cityViewItem: CityWithForecast) {
         binding.cityHolderInCardView.root.setOnClickListener {
-            viewModel.clickOnCity(forecast.cityId)
+            viewModel.clickOnCity()
         }
         binding.cityHolderInCardView.root.visibility = View.VISIBLE
-        binding.cityHolderInCardView.cityHolder.cityNameTextView.text = forecast.name
+        binding.cityHolderInCardView.cityHolder.cityNameTextView.text = cityViewItem.forecast!!.name
         binding.cityHolderInCardView.cityHolder.pressureTextView.text =
-            forecast.pressure.toString()
+            cityViewItem.forecast.pressure.toString()
         binding.cityHolderInCardView.cityHolder.tempTextView.text =
-            forecast.temp.toTemperature()
+            cityViewItem.forecast.temp.toTemperature()
         binding.cityHolderInCardView.cityHolder.windTextView.text =
             binding.root.context.getString(
-                forecast.windDeg.toCardinalPoints(),
-                forecast.windSpeed.toString(),
+                cityViewItem.forecast.windDeg.toCardinalPoints(),
+                cityViewItem.forecast.windSpeed.toString(),
                 binding.root.context.getString(R.string.speed)
             )
         Glide
             .with(requireActivity())
-            .load("https://openweathermap.org/img/wn/${forecast.icon}@2x.png")
+            .load("https://openweathermap.org/img/wn/${cityViewItem.forecast.icon}@2x.png")
             .into(binding.cityHolderInCardView.cityHolder.iconImageView)
     }
 

@@ -29,11 +29,11 @@ class StoreModule {
             .build()
 
     @Provides
-    fun provideCityDao(db: RoomDB): CityDao = db.getCityDao()
+    fun provideCityDao(db: RoomDB): CityDao = db.cityDao
 
     @Provides
-    fun provideCityForecastDao(db: RoomDB): CityForecastDao = db.getCityForecastDao()
+    fun provideCityForecastDao(db: RoomDB): CityForecastDao = db.cityForecastDao
 
     @Provides
-    fun provideCityWithForecastDao(db: RoomDB): CityWithForecastDao = db.getCityWithForecast()
+    fun provideCityWithForecastDao(db: RoomDB): CityWithForecastDao = db.cityWithForecast
 }

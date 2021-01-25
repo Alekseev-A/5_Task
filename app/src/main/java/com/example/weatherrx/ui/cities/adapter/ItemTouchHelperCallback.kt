@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 class ItemTouchHelperCallback(
-    private val onItemMove: (Int, Int) -> Unit,
+    private val onItemMove: (from: Int, to: Int) -> Unit,
     private val onItemDismiss: (Int) -> Unit,
     private val onDrag: (Boolean) -> Unit,
 ) : ItemTouchHelper.SimpleCallback(

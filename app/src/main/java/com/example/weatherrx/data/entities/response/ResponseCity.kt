@@ -3,7 +3,7 @@ package com.example.weatherrx.data.entities.response
 class ResponseCity(
     val coord: Coord,
     val dt: Long,
-    val id: Int,
+    val id: Long,
     val main: Main,
     val name: String,
     val weather: List<Weather>,

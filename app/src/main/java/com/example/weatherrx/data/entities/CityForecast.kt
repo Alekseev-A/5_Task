@@ -14,12 +14,13 @@ import androidx.room.PrimaryKey
         onUpdate = ForeignKey.CASCADE
     )]
 )
-data class CityForecast(
+
+data class CityForecast (
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val day: Int = 0,
     val dt: Long,
-    val cityId: Int,
+    val cityId: Long,
     val name: String,
     val icon: String,
     val pressure: Int,

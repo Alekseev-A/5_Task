@@ -1,6 +1,7 @@
 package com.example.weatherrx.data.store
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.weatherrx.data.entities.CityWithForecast

@@ -17,9 +17,9 @@ import javax.inject.Provider
     version = 1
 )
 abstract class RoomDB : RoomDatabase() {
-    abstract fun getCityDao(): CityDao
-    abstract fun getCityForecastDao(): CityForecastDao
-    abstract fun getCityWithForecast(): CityWithForecastDao
+    abstract val cityDao: CityDao
+    abstract val cityForecastDao: CityForecastDao
+    abstract val cityWithForecast: CityWithForecastDao
 
     class Callback @Inject constructor(
         private val database: Provider<CityDao>

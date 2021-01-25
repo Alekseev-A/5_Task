@@ -70,10 +70,6 @@ class CitiesListViewModel @Inject constructor(
 
     }
 
-    fun onCityLongClick(cityViewItem: CityViewItem) {
-
-    }
-
     fun selectCityForDelete(city: CityViewItem) {
         disposeBag.add(
             Completable.fromAction {
@@ -84,12 +80,13 @@ class CitiesListViewModel @Inject constructor(
         )
     }
 
-    fun selectCitiesForSwapPositions(first: CityViewItem, second: CityViewItem) {
+    fun changeCityPosition(cityViewItem: CityViewItem, position: Int) {
         disposeBag.add(
-            Completable.fromAction {
-                citiesRepository.swapPositionsForCities(first.city, second.city)
-            }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+            Completable
+                .fromAction {
+                    citiesRepository.changeCityPosition(cityViewItem.city, position)
+                }
+                .subscribeOn(Schedulers.io())
                 .subscribe()
         )
     }

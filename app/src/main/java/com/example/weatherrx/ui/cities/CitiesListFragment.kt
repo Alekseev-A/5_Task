@@ -116,23 +116,8 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities) {
     }
 
 
-    private fun swapCitiesIndexesByPosition(fromPosition: Int, toPosition: Int) {
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                viewModel.selectCitiesForSwapPositions(
-                    adapter.getItem(i),
-                    adapter.getItem(i + 1)
-                )
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                viewModel.selectCitiesForSwapPositions(
-                    adapter.getItem(i),
-                    adapter.getItem(i - 1)
-                )
-            }
-        }
-        adapter.notifyItemMoved(fromPosition, toPosition)
+    private fun swapCitiesIndexesByPosition(fromPosition: Int, newPosition: Int) {
+        viewModel.changeCityPosition(adapter.getItem(fromPosition), adapter.getItem(newPosition).city.position)
     }
 
     private fun SwipeRefreshLayout.setup() {

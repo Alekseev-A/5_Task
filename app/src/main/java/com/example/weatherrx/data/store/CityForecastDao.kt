@@ -12,8 +12,11 @@ abstract class CityForecastDao {
     @Query("DELETE FROM city_forecast")
     abstract fun deleteAllCityForecast()
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert
     abstract fun insertCitiesForecast(forecasts: List<CityForecast>)
+
+    @Insert
+    abstract fun insertCityForecast(forecast: CityForecast)
 
     @Transaction
     open fun updateAllForecasts(forecasts: List<CityForecast>) {

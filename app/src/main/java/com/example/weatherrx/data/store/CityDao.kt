@@ -1,39 +1,42 @@
 package com.example.weatherrx.data.store
 
-import android.util.Log
 import androidx.room.*
 import com.example.weatherrx.data.entities.City
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.CompletableOnSubscribe
 import io.reactivex.rxjava3.core.Observable
 
 @Dao
 interface CityDao {
     @Query("SELECT * FROM city")
-    fun getCities(): Observable<List<City>>
+    fun getCitiesObservable(): Observable<List<City>>
+
+    @Query("SELECT * FROM city ORDER BY city.position DESC")
+    fun getCities(): List<City>
 
     @Query("SELECT * FROM city WHERE id IS :id")
     fun getCity(id: Int): Observable<City?>
 
+    @Query("SELECT * FROM city WHERE city.position BETWEEN :from and :to")
+    fun getCitiesBetweenPositions(from: Int, to : Int): List<City>
+
+    @Transaction
+    fun insertCity(id: Long) = insertCity(
+        City(
+            id = id,
+            position = getMaxPosition() + 1
+        )
+    )
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insertCity(city: City): Long
 
-    @Query("UPDATE city SET position = :position where id = :id")
-    fun updateCityPosition(id: Int, position: Long)
+    @Update
+    fun updateCities(city: List<City>)
 
-    @Transaction
-    fun swapPositions(first: City, second:City){
-        updateCityPosition(first.id, second.position)
-        updateCityPosition(second.id, first.position)
-    }
+    @Query("UPDATE city SET position = :count where id = :id")
+    fun updateCityPosition(id: Int, count: Long)
 
-    @Transaction
-    fun insertCityWithCurrentPosition(id : Int) {
-        Log.d("TAG", "insertCityWithCurrentPosition: before")
-        val position = insertCity(City(id = id, position = -1))
-        Log.d("TAG", "insertCityWithCurrentPosition: after $position")
-        updateCityPosition(id, position)
-    }
+    @Query("SELECT MAX(city.position) FROM city")
+    fun getMaxPosition(): Int
 
     @Delete
     fun deleteCity(city: City)
