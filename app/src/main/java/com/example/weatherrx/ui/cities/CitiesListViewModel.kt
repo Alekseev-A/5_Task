@@ -15,7 +15,8 @@ import javax.inject.Inject
 class CitiesListViewModel @Inject constructor(
     private val citiesRepository: CitiesRepository,
 ) : ViewModel() {
-    private val router = Router
+    private val routerNavigation =
+        Router.getNavigation(this) as Router.FragmentNavigation.ForCitiesList
     private val disposeBag = CompositeDisposable()
 
     val citiesBehaviorSubject: BehaviorSubject<List<CityViewItem>> =
@@ -67,13 +68,9 @@ class CitiesListViewModel @Inject constructor(
         }
 
 
-    fun onCityClick(cityViewItem: CityViewItem) {
-        router.getNavigator(this).toDetailsFragment(cityViewItem)
-    }
+    fun onCityClick(cityViewItem: CityViewItem) = routerNavigation.toDetailsFragment(cityViewItem)
 
-    fun onFabClick() {
-        router.getNavigator(this).toFindFragment()
-    }
+    fun onFabClick() = routerNavigation.toFindFragment()
 
     fun selectCityForDelete(city: CityViewItem) {
         disposeBag.add(
