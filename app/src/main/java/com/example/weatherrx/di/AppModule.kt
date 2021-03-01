@@ -2,6 +2,7 @@ package com.example.weatherrx.di
 
 import android.app.Application
 import android.content.Context
+import androidx.navigation.NavController
 import dagger.Module
 import dagger.Provides
 import com.example.weatherrx.App

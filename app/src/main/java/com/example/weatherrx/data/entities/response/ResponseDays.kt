@@ -4,25 +4,18 @@ import com.google.gson.annotations.SerializedName
 
 class ResponseDays(
     @SerializedName("daily")
-    val days: List<Day>
+    val days: List<ResponseDay>
 ) {
-    class Day(
-        val clouds: Int,
-        val dew_point: Double,
+    class ResponseDay(
         val dt: Long,
-        val humidity: Int,
-        val pop: Double,
         val pressure: Int,
-        val snow: Double,
-        val sunrise: Int,
-        val sunset: Int,
-        val temp: Temp,
-        val weather: List<Weather>,
+        val temp: ResponseTemp,
+        val weather: List<ResponseWeather>,
         val wind_deg: Int,
         val wind_speed: Double
     ) {
-        class Weather(val icon: String)
-        class Temp(val day: Double)
+        class ResponseWeather(val icon: String)
+        class ResponseTemp(val day: Double)
     }
 }
 

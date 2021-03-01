@@ -22,8 +22,7 @@ import javax.inject.Inject
 
 class FindFragment : Fragment(R.layout.fragment_find) {
 
-    lateinit var viewModel: FindViewModel
-
+    private lateinit var viewModel: FindViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private var _binding: FragmentFindBinding? = null
@@ -41,7 +40,6 @@ class FindFragment : Fragment(R.layout.fragment_find) {
         super.onViewCreated(view, savedInstanceState)
 
         _binding = FragmentFindBinding.bind(view).setup()
-        observeVM()
     }
 
     override fun onDestroyView() {
@@ -69,9 +67,9 @@ class FindFragment : Fragment(R.layout.fragment_find) {
             viewModel.clickOnCity()
         }
         binding.cityHolderInCardView.root.visibility = View.VISIBLE
-        binding.cityHolderInCardView.cityHolder.cityNameTextView.text = cityViewItem.forecast!!.name
+        binding.cityHolderInCardView.cityHolder.cityNameTextView.text = cityViewItem.city.name
         binding.cityHolderInCardView.cityHolder.pressureTextView.text =
-            cityViewItem.forecast.pressure.toString()
+            cityViewItem.forecast!!.pressure.toString()
         binding.cityHolderInCardView.cityHolder.tempTextView.text =
             cityViewItem.forecast.temp.toTemperature()
         binding.cityHolderInCardView.cityHolder.windTextView.text =
@@ -93,8 +91,6 @@ class FindFragment : Fragment(R.layout.fragment_find) {
                 KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_CENTER))
         }
 
-//        editTextTextPersonName.isFocusableInTouchMode = true
-//        editTextTextPersonName.touch
         editTextTextPersonName.doOnTextChanged { name, _, _, _ ->
             viewModel.setNameForSearch(name.toString())
         }

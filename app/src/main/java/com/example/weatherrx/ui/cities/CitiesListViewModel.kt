@@ -3,6 +3,7 @@ package com.example.weatherrx.ui.cities
 import androidx.lifecycle.ViewModel
 import com.example.weatherrx.data.entities.CityWithForecast
 import com.example.weatherrx.domain.CitiesRepository
+import com.example.weatherrx.ui.Router
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class CitiesListViewModel @Inject constructor(
     private val citiesRepository: CitiesRepository,
 ) : ViewModel() {
+    private val router = Router
     private val disposeBag = CompositeDisposable()
 
     val citiesBehaviorSubject: BehaviorSubject<List<CityViewItem>> =
@@ -28,7 +30,7 @@ class CitiesListViewModel @Inject constructor(
     init {
         disposeBag.add(
             citiesRepository
-                .citiesWithForecast
+                .citiesWithForecast()
                 .subscribe({
                     citiesBehaviorSubject.onNext(convertToViewItem(it))
                 }, {
@@ -57,9 +59,8 @@ class CitiesListViewModel @Inject constructor(
     }
 
     private fun convertToViewItem(citiesWithForecast: List<CityWithForecast>) =
-        citiesWithForecast.mapNotNull {
-            if (it.forecast == null) return@mapNotNull null
-            else CityViewItem(
+        citiesWithForecast.map {
+            CityViewItem(
                 it.city,
                 it.forecast
             )
@@ -67,7 +68,11 @@ class CitiesListViewModel @Inject constructor(
 
 
     fun onCityClick(cityViewItem: CityViewItem) {
+        router.getNavigator(this).toDetailsFragment(cityViewItem)
+    }
 
+    fun onFabClick() {
+        router.getNavigator(this).toFindFragment()
     }
 
     fun selectCityForDelete(city: CityViewItem) {

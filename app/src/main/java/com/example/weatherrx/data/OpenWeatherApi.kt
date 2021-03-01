@@ -24,11 +24,12 @@ interface OpenWeatherApi {
 
     @GET("onecall")
     fun getDetails(
-        @Query("id") cityId: Int,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
 //        @Query("lang") language: String,
         @Query("units") units: String = UNITS,
         @Query("appid") key: String = API_KEY,
-        @Query("exclude") exclude: String = "minutely,hourly,alerts"
+        @Query("exclude") exclude: String = "current,minutely,hourly,alerts"
     ): Single<ResponseDays>
 
     @GET("group")

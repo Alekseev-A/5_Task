@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.core.Observable
 
 @Dao
 interface CityWithForecastDao {
+
     @Transaction
     @Query("SELECT * FROM city ORDER BY city.position DESC")
     fun getCityWithForecast(): Observable<List<CityWithForecast>>

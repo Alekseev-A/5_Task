@@ -1,8 +1,10 @@
 package com.example.weatherrx.data.entities
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 @Entity(
     tableName = "city_forecast",
@@ -14,17 +16,15 @@ import androidx.room.PrimaryKey
         onUpdate = ForeignKey.CASCADE
     )]
 )
-
-data class CityForecast (
+@Parcelize
+data class CityForecast(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val day: Int = 0,
     val dt: Long,
     val cityId: Long,
-    val name: String,
     val icon: String,
     val pressure: Int,
     val temp: Double,
     val windDeg: Int,
-    val windSpeed: Double
-)
+    val windSpeed: Double,
+) : Parcelable

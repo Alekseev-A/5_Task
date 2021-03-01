@@ -38,7 +38,7 @@ class CitiesAdapter(
         }
 
         fun renderCityName() {
-            binding.cityHolder.cityNameTextView.text = cityViewItem.forecast.name
+            binding.cityHolder.cityNameTextView.text = cityViewItem.city.name
         }
 
         fun renderPressure() {
@@ -83,7 +83,7 @@ class CitiesAdapter(
             oldItem: CityViewItem,
             newItem: CityViewItem
         ) = mutableListOf<CityViewItemHolder.() -> Unit>().apply {
-            if (oldItem.forecast.name != newItem.forecast.name) add { renderCityName() }
+            if (oldItem.city.name != newItem.city.name) add { renderCityName() }
             if (oldItem.forecast.pressure != newItem.forecast.pressure) add { renderPressure() }
             if (oldItem.forecast.temp != newItem.forecast.temp) add { renderTemperature() }
             if (oldItem.forecast.windDeg != newItem.forecast.windDeg ||

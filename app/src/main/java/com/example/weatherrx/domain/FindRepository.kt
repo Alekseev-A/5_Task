@@ -18,14 +18,18 @@ class FindRepository @Inject constructor(
             .getCity(name = name)
             .map { city ->
                 CityWithForecast(
-                    City(id = city.id, position = -1),
+                    City(id = city.id,
+                        position = db.cityDao.getMaxPosition() + 1,
+                        lat = city.coord.lat,
+                        lon = city.coord.lon,
+                        name = city.name
+                    ),
                     CityForecast(
                         dt = city.dt,
                         cityId = city.id,
                         icon = city.weather[0].icon,
                         windDeg = city.wind.deg,
                         windSpeed = city.wind.speed,
-                        name = city.name,
                         pressure = city.main.pressure,
                         temp = city.main.temp
                     )
@@ -35,7 +39,7 @@ class FindRepository @Inject constructor(
 
     fun addCityInDB(cityWithForecast: CityWithForecast): Completable =
         Completable.fromAction {
-            db.cityDao.insertCity(cityWithForecast.city.id)
+            db.cityDao.insertCity(cityWithForecast.city)
             db.cityForecastDao.insertCityForecast(cityWithForecast.forecast!!)
         }
 

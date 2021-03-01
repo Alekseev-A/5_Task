@@ -6,8 +6,6 @@ import io.reactivex.rxjava3.core.Single
 
 @Dao
 abstract class CityForecastDao {
-    @Query("SELECT * FROM city_forecast where cityId=:cityId")
-    abstract fun getCityForecast(cityId: Int): Single<CityForecast>
 
     @Query("DELETE FROM city_forecast")
     abstract fun deleteAllCityForecast()

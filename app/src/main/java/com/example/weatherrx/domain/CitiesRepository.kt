@@ -13,8 +13,13 @@ class CitiesRepository @Inject constructor(
     private val db: RoomDB,
     private val api: OpenWeatherApi,
 ) {
-    val citiesWithForecast: Observable<List<CityWithForecast>> =
-        db.cityWithForecast.getCityWithForecast()
+    fun citiesWithForecast(): Observable<List<CityWithForecast>> =
+        db.cityWithForecast
+            .getCityWithForecast()
+            .onErrorResumeNext {
+                refreshCities().andThen(citiesWithForecast())
+            }
+            .retry()
 
     fun refreshCities(): Completable = db.cityDao
         .getCitiesObservable()
@@ -37,7 +42,6 @@ class CitiesRepository @Inject constructor(
                         icon = city.weather[0].icon,
                         windDeg = city.wind.deg,
                         windSpeed = city.wind.speed,
-                        name = city.name,
                         pressure = city.main.pressure,
                         temp = city.main.temp
                     )
@@ -46,22 +50,22 @@ class CitiesRepository @Inject constructor(
         .ignoreElement()
 
     fun changeCityPosition(city: City, position: Int) = db.runInTransaction {
-        val decrement = city.position < position
+        val isRises = city.position < position
 
         val citiesForDeviationByOne =
-            if (decrement) db.cityDao.getCitiesBetweenPositions(city.position + 1, position)
+            if (isRises) db.cityDao.getCitiesBetweenPositions(city.position + 1, position)
             else db.cityDao.getCitiesBetweenPositions(position, city.position - 1)
+
         if (citiesForDeviationByOne.any { it.id == city.id }) return@runInTransaction
 
         val changedCities = mutableListOf<City>()
-        changedCities.add(City(city.id, position))
-        val newPosition = { x: Int -> if (decrement) x - 1 else x + 1 }
+        changedCities.add(
+            city.copy(position = position)
+        )
+        val newPosition = { x: Int -> if (isRises) x - 1 else x + 1 }
         citiesForDeviationByOne.forEach {
             changedCities.add(
-                City(
-                    it.id,
-                    newPosition(it.position)
-                )
+                it.copy(position = newPosition(it.position))
             )
         }
         db.cityDao.updateCities(changedCities)
@@ -74,11 +78,8 @@ class CitiesRepository @Inject constructor(
 
         val newList = originalCities
             .takeWhile { city -> city.position > position }
-            .map { city ->
-                City(
-                    city.id,
-                    city.position - 1
-                )
+            .map {
+                it.copy(position = it.position - 1)
             }
 
         db.cityDao.deleteCity(city)

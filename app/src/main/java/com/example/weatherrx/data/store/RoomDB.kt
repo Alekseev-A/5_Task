@@ -29,9 +29,8 @@ abstract class RoomDB : RoomDatabase() {
 
             Thread {
                 val dao = database.get()
-                val first = dao.insertCity(City(id = 625144, position = 1))
-                val second = dao.insertCity(City(id = 524901, position = 2))
-                Log.d("TAG", "onCreate: $first $second")
+                dao.insertCity(City(id = 625144, position = 1, lat = 53.9, lon = 27.5667, name = "Minsk"))
+                dao.insertCity(City(id = 524901, position = 2, lat = 55.7522, lon = 37.6156, name = "Moscow"))
             }.start()
         }
     }

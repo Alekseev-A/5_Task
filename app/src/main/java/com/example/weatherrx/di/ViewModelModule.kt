@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherrx.ui.cities.CitiesListViewModel
 import com.example.weatherrx.ui.core.ViewModelFactory
+import com.example.weatherrx.ui.details.DetailsViewModel
 import com.example.weatherrx.ui.find.FindViewModel
 import dagger.Binds
 import dagger.MapKey
@@ -23,6 +24,12 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(CitiesListViewModel::class)
     internal abstract fun citiesListViewModel(viewModel: CitiesListViewModel): ViewModel
+
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DetailsViewModel::class)
+    internal abstract fun detailsViewModel(viewModel: DetailsViewModel): ViewModel
 
     @Binds
     @IntoMap

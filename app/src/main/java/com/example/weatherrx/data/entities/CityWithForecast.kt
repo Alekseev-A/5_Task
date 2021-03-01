@@ -8,5 +8,5 @@ data class CityWithForecast(
     @Relation(
         parentColumn = "id",
         entityColumn = "cityId"
-    ) val forecast: CityForecast?
+    ) val forecast: CityForecast
 )
